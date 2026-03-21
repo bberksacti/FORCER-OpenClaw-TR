@@ -3,6 +3,8 @@ Kişisel Akademik Operasyon Sistemi ve AI Ders Koçu
 
 FORCER, bir mühendislik öğrencisinin akademik hayatını deterministik veri modelleri ve LLM (Gemini 2.5 Flash) gücüyle optimize eden, VPS üzerinde çalışan otonom bir ajan sistemidir.
 
+FORCER, ders çalışmaya başlamakta zorlanan ve istikrar problemi yaşayan öğrenciler için tasarlanmış davranış odaklı bir AI çalışma sistemidir.
+
 *** Evrim: V0.1'den V1.0'a
 Proje, basit bir zamanlayıcıdan karmaşık bir durum makinesine (State Machine) dönüşmüştür:
 
