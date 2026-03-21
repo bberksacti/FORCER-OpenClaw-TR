@@ -5,6 +5,7 @@ FORCER, bir mühendislik öğrencisinin akademik hayatını deterministik veri m
 
 FORCER, ders çalışmaya başlamakta zorlanan ve istikrar problemi yaşayan öğrenciler için tasarlanmış davranış odaklı bir AI çalışma sistemidir.
 (bu versiyon kendime özel tasarlandığı için şuan veriler kişisel optimize edildi)
+
 *** Evrim: V0.1'den V1.0'a
 Proje, basit bir zamanlayıcıdan karmaşık bir durum makinesine (State Machine) dönüşmüştür:
 
