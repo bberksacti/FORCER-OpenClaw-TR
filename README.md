@@ -6,7 +6,7 @@
 
 **Yayınlanan sürüm:** `V1.0`  
 **Durum:** Operasyonel / kişisel kullanımda aktif
-**Güncel sürüm:** 'V1.1'
+**Güncel sürüm:** 'V1.2'
 
 ---
 
