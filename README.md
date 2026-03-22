@@ -138,3 +138,12 @@ Buna rağmen FORCER, kişisel kullanımın ötesinde şu alanlar için de güçl
 - Günlük verim skoru artık **Notion** tarafına da gönderiliyor
 - Notion'da yeni bir **Verim** kolonu eklendi; bu veri artık **Looker Studio** üzerinde trend grafikleri üretmek için kullanılabiliyor
 - Streak takibi otomatik hale getirildi; manuel müdahale ihtiyacı kaldırıldı
+
+### V1.2
+-Çalışma Süresi Hesaplama Mantığı Güncellendi: Durum Makinesi (State Machine) tabanlı akümülasyon hatası giderildi; artık her mola ve bitiş komutunda aktif çalışma süresi kümülatif olarak hatasız bir şekilde hesaplanıyor.
+-Mola Süresi Takibi (Time Tracking): Sisteme toplam mola süresi takibi eklendi; bugun_toplam_mola_sure alanı üzerinden günlük toplam kayıp zaman metrikleri tutulmaya başlandı.
+-Odak Puanı Formülü V2: Odak puanı hesaplamasına "mola cezası" parametresi eklendi; mola sürelerinin aktif çalışma süresine oranına göre dinamik ve daha gerçekçi bir verim skoru üretilmesi sağlandı.
+-Gün Notu Eşik Değerleri (Thresholds) Optimize Edildi: Kullanıcı geri bildirimleri doğrultusunda gün sonu skor etiketleri (1-4: Kötü, 5-7: Orta, 8-10: İyi) olarak yeniden yapılandırıldı.
+-Operasyonel Esneklik Komutları (hgb & ara): Kısa ihtiyaçlar için hgb (hemen geliyorum) ve dışsal uzun kesintiler için ara komutları eklendi; bu komutlar mola sayısını artırmadan süreyi dondurma imkanı tanıyor.
+-Raporlama ve Sıfırlama Döngüsü Güncellendi: Haftalık raporlama ve sistem sıfırlama saati, kullanıcı yaşam döngüsüne uyum sağlaması amacıyla Pazartesi 03:00’a çekildi.
+-Veri Yapısı Güncellemesi: MEMORY.md dosya yapısı, yeni mola metriklerini ve operasyonel verileri destekleyecek şekilde genişletildi.
