@@ -151,9 +151,15 @@ Buna rağmen FORCER, kişisel kullanımın ötesinde şu alanlar için de güçl
 ## V2 Güncellemesi — Forcer’ın Fiziksele Taşınması
 
 Forcer V2 ile sistem yalnızca Telegram üzerinden çalışan bir ders koçu olmaktan çıkarılıp fiziksel bir kontrol katmanına taşındı. Bu sürümde kullanıcı artık bilgisayara veya telefona dokunmadan, masadaki fiziksel butonlarla seansını yönetebiliyor; LED’lerden anlık durumu görebiliyor ve buzzer üzerinden sesli geri bildirim alabiliyor. Mimari; fiziksel kontrol, ESP32, VPS sunucusu, Telethon tabanlı kullanıcı hesabı entegrasyonu ve Forcer botu arasında katmanlı bir akışla çalışıyor. Butona basıldığında sinyal ESP32 tarafından okunuyor, HTTP isteği Flask sunucusuna gidiyor, Telethon kullanıcı hesabından Telegram’a mesaj gönderiyor ve Forcer komutu sanki kullanıcı yazmış gibi işliyor. ESP32 de düzenli olarak VPS’ten durum çekerek LED’leri güncelliyor.
+
 İşte donanım için teknik detaylar: 
 [**Forcer devre kurulumu 1**](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER_FIZIKSEL_DEVRE_RAPORU.pdf)
 [**Forcer devre 2 Tamamlanmış versiyon**](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER%20DEVRE%20V2.pdf)
+
+https://github.com/user-attachments/assets/1cd14692-8bbf-4f5c-a08e-54fbd070131a
+
+
+
 - Donanım Tarafı
 Donanım tarafında sistem ESP32 DevKit C V4 üzerine kuruldu. Fiziksel arayüz; 3 adet panel tipi anlık buton, 3 adet durum LED’i, aktif buzzer, 220Ω LED dirençleri ve 10kΩ pull-down dirençlerinden oluşuyor. Butonlar mola, devam ve bitir komutlarını fiziksel olarak tetikliyor. LED’ler ise Forcer’ın durumunu görsel olarak yansıtıyor: kırmızı idle/day_closed, sarı on_break, yeşil in_session. Ayrıca Wi-Fi kopması durumunda üç LED birden yanarak hata geri bildirimi veriyor.
 Pin tarafında tasarım, gerçek donanım sorunları görülerek rafine edildi. Boot-sensitive pinler ve fiziksel arızalar nedeniyle bazı GPIO’lar değiştirildi; final eşleşme mola=GPIO12, devam=GPIO19, bitir=GPIO34, red=GPIO13, yellow=GPIO25, green=GPIO26, buzzer=GPIO32 olarak oturdu. Özellikle GPIO14’ün reboot sorunu, GPIO27’nin fiziksel hasarı ve GPIO33’ün pull-down desteği vermemesi gerçek donanım üzerinde tespit edilip çözüldü. Bu sayede V2 sadece teorik değil, sahada denenmiş bir fiziksel sürüm haline geldi.
