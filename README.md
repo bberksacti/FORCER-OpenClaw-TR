@@ -156,9 +156,7 @@ Forcer V2 ile sistem yalnızca Telegram üzerinden çalışan bir ders koçu olm
 [**Forcer devre kurulumu 1**](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER_FIZIKSEL_DEVRE_RAPORU.pdf)
 [**Forcer devre 2 Tamamlanmış versiyon**](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER%20DEVRE%20V2.pdf)
 
-https://github.com/user-attachments/assets/1cd14692-8bbf-4f5c-a08e-54fbd070131a
-
-
+![WhatsApp Video 2026-03-29 at 8 27 29 PM (1) (online-video-cutter com) (1) (6)](https://github.com/user-attachments/assets/e0f2a57f-1608-4829-9f2e-b3e310c9c6cc)
 
 - Donanım Tarafı
 Donanım tarafında sistem ESP32 DevKit C V4 üzerine kuruldu. Fiziksel arayüz; 3 adet panel tipi anlık buton, 3 adet durum LED’i, aktif buzzer, 220Ω LED dirençleri ve 10kΩ pull-down dirençlerinden oluşuyor. Butonlar mola, devam ve bitir komutlarını fiziksel olarak tetikliyor. LED’ler ise Forcer’ın durumunu görsel olarak yansıtıyor: kırmızı idle/day_closed, sarı on_break, yeşil in_session. Ayrıca Wi-Fi kopması durumunda üç LED birden yanarak hata geri bildirimi veriyor.
