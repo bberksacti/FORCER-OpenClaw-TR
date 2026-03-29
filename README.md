@@ -126,7 +126,7 @@ Buna rağmen FORCER, kişisel kullanımın ötesinde şu alanlar için de güçl
 
 ---
 
-## Updates
+# Updates
 
 ### V1.1
 - `bitir` komutu davranışı güncellendi  
