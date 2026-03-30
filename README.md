@@ -1,4 +1,4 @@
-# FORCER-OpenClaw-TR V1.0
+# FORCER-OpenClaw-TR V2.0
 
 ---
 
