@@ -151,46 +151,46 @@ Buna rağmen FORCER, kişisel kullanımın ötesinde şu alanlar için de güçl
 - Raporlama ve Sıfırlama Döngüsü Güncellendi: Haftalık raporlama ve sistem sıfırlama saati, kullanıcı yaşam döngüsüne uyum sağlaması amacıyla Pazartesi 03:00’a çekildi.
 - Veri Yapısı Güncellemesi: MEMORY.md dosya yapısı, yeni mola metriklerini ve operasyonel verileri destekleyecek şekilde genişletildi.
 
-## V2 Guncellemesi - Forcer Fiziksel Kontrol Katmani
+## V2 Güncellemesi - Forcer Fiziksel Kontrol Katmanı
 
-Forcer V2 ile sistem sadece Telegram uzerinden calisan bir bot olmaktan cikip, tamamen fiziksel bir kontrol arayuzune tasindi. Bu surumun temel amaci, kullanicinin telefon veya bilgisayar bagimliligini azaltarak masadaki fiziksel butonlarla tum sureci yonetmesini saglamaktir.
+Forcer V2 ile sistem sadece Telegram üzerinden çalışan bir bot olmaktan çıkıp, tamamen fiziksel bir kontrol arayüzüne taşındı. Bu sürümün temel amacı, kullanıcının telefon veya bilgisayar bağımlılığını azaltarak masadaki fiziksel butonlarla tüm süreci yönetmesini sağlamaktır.
 
-### Sistem Calisma Mantigi ve Akis
-Sistem; fiziksel donanim, ESP32, VPS sunucusu ve Telethon tabanli bir daemon arasinda cok katmanli bir yapiyla calisiyor:
+### Sistem Çalışma Mantığı ve Akış
+Sistem; fiziksel donanım, ESP32, VPS sunucusu ve Telethon tabanlı bir daemon arasında çok katmanlı bir yapıyla çalışıyor:
 
-- Kullanici fiziksel butona bastiginda sinyal ESP32 tarafindan yakalanir.
-- ESP32, VPS uzerindeki Flask sunucusuna ilgili komut icin bir HTTP istegi gonderir.
-- Flask sunucusu, Telethon kutuphanesi ile kullanicinin kendi Telegram hesabi uzerinden Forcer botuna mesaj gonderir. 
-- Bu sayede bot, mesaji gercekten kullanici yazmis gibi algilar ve sureci baslatir.
-- ESP32 her 5 saniyede bir VPS'ten guncel durumu sorgulayarak LED renklerini gunceller.
+- Kullanıcı fiziksel butona bastığında sinyal ESP32 tarafından yakalanır.
+- ESP32, VPS üzerindeki Flask sunucusuna ilgili komut için bir HTTP isteği gönderir.
+- Flask sunucusu, Telethon kütüphanesi ile kullanıcının kendi Telegram hesabı üzerinden Forcer botuna mesaj gönderir. 
+- Bu sayede bot, mesajı gerçekten kullanıcı yazmış gibi algılar ve süreci başlatır.
+- ESP32 her 5 saniyede bir VPS'ten güncel durumu sorgulayarak LED renklerini günceller.
 
-### Donanim Detaylari ve Pin Semasi
-Donanim tarafı ESP32 DevKit C V4 uzerine kurulu olup; 3 adet panel tipi buton, durum LED'leri ve sesli geri bildirim icin buzzer/DFPlayer icermektedir. Donanim kurulumu sirasinda boot-sensitive pinler ve donanim hatalari nedeniyle rafine edilen final pin semasi su sekildedir:
+### Donanım Detayları ve Pin Şeması
+Donanım tarafı ESP32 DevKit C V4 üzerine kurulu olup; 3 adet panel tipi buton, durum LED'leri ve sesli geri bildirim için buzzer/DFPlayer içermektedir. Donanım kurulumu sırasında boot-sensitive pinler ve donanım hataları nedeniyle rafine edilen final pin şeması şu şekildedir:
 
-| Fonksiyon | GPIO Pin | Aciklama |
+| Fonksiyon | GPIO Pin | Açıklama |
 | :--- | :--- | :--- |
 | Mola Butonu | GPIO 12 | Pull-down |
 | Devam Butonu | GPIO 19 | Pull-down |
 | Bitir Butonu | GPIO 34 | Pull-down |
-| Kirmizi LED (Idle) | GPIO 13 | 220 Ohm direncli |
-| Sari LED (Mola) | GPIO 25 | 220 Ohm direncli |
-| Yesil LED (Seans) | GPIO 26 | 220 Ohm direncli |
-| Buzzer | GPIO 32 | Aktif sesli uyari |
+| Kırmızı LED (Idle) | GPIO 13 | 220 Ohm dirençli |
+| Sarı LED (Mola) | GPIO 25 | 220 Ohm dirençli |
+| Yeşil LED (Seans) | GPIO 26 | 220 Ohm dirençli |
+| Buzzer | GPIO 32 | Aktif sesli uyarı |
 
-*Not: GPIO 14 (reboot sorunu), GPIO 27 (fiziksel ariza) ve GPIO 33 (pull-down sorunu) nedeniyle bu pinlerden vazgecilmistir.*
+*Not: GPIO 14 (reboot sorunu), GPIO 27 (fiziksel arıza) ve GPIO 33 (pull-down sorunu) nedeniyle bu pinlerden vazgeçilmiştir.*
 
 ![WhatsApp Video 2026-03-29 at 8 27 29 PM (1) (online-video-cutter com) (1) (6)](https://github.com/user-attachments/assets/e0f2a57f-1608-4829-9f2e-b3e310c9c6cc)
 
-### Yazilim ve Model Guncellemeleri
-V1.2 sonrasinda yapilan kritik iyilestirmeler:
+### Yazılım ve Model Güncellemeleri
+V1.2 sonrasında yapılan kritik iyileştirmeler:
 
-- gorev_sirasi Mantigi: Gorev listesi artik basit bir metin degil, sirali bir kuyruk (queue) olarak tutuluyor. "basladim" komutu ilk gorevi secerken, "bitti" komutu otomatik olarak siradaki goreve gecis sagliyor.
-- Model Degisikligi: Gemini 2.5 Flash yerine Gemini 2.5 Flash Lite modeline gecildi. Bu tercih hizdan ziyade, fiziksel cihaz uzerinden yapilan hizli ve ardisik isteklerde RPM (dakikadaki istek) sinirlarina takilmamak ve maliyeti optimize etmek amaciyla yapildi.
-- MicroPython Optimizasyonu: HTTP istekleri ayri bir thread uzerinden gonderilerek ana dongunun buton okuma sirasinda donmasi engellendi.
+- gorev_sirasi Mantığı: Görev listesi artık basit bir metin değil, sıralı bir kuyruk (queue) olarak tutuluyor. "başladım" komutu ilk görevi seçerken, "bitti" komutu otomatik olarak sıradaki göreve geçiş sağlıyor.
+- Model Değişikliği: Gemini 2.5 Flash yerine Gemini 2.5 Flash Lite modeline geçildi. Bu tercih hızdan ziyade, fiziksel cihaz üzerinden yapılan hızlı ve ardışık isteklerde RPM (dakikadaki istek) sınırlarına takılmamak ve maliyeti optimize etmek amacıyla yapıldı.
+- MicroPython Optimizasyonu: HTTP istekleri ayrı bir thread üzerinden gönderilerek ana döngünün buton okuma sırasında donması engellendi.
 
 ### Geri Bildirim ve Senkronizasyon
-- LED Halka (WS2812B): in_session, on_break ve day_closed durumlari icin farkli isik profilleri tanimlandi. Mola durumunda 4 sari + 4 kirmizi segmentli ozel bir gosterim eklendi.
-- Ses Sistemi: DFPlayer Mini uzerindeki thread cakismalari "play_token" yapisiyla cozuldu. SD kart uzerindeki ses dosyalari indekslenerek alarm ve onay sesleri stabilize edildi.
+- LED Halka (WS2812B): in_session, on_break ve day_closed durumları için farklı ışık profilleri tanımlandı. Mola durumunda 4 sarı + 4 kırmızı segmentli özel bir gösterim eklendi.
+- Ses Sistemi: DFPlayer Mini üzerindeki thread çakışmaları "play_token" yapısıyla çözüldü. SD kart üzerindeki ses dosyaları indekslenerek alarm ve onay sesleri stabilize edildi.
 
 [Forcer Devre Raporu 1](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER_FIZIKSEL_DEVRE_RAPORU.pdf)
-[Forcer V2 Final Devre Semasi](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER%20DEVRE%20V2.pdf)
+[Forcer V2 Final Devre Şeması](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER%20DEVRE%20V2.pdf)
