@@ -70,7 +70,8 @@ Gemini 2.5 Flash API
 
 **Veri Analitiği Hattı:**  
 Notion API -> Google Sheets -> Looker Studio Dashboard
-Test verilerinde elde edilmiş Looker Studio arayüzü garfikleri:
+
+Looker Studio arayüzü garfikleri (Test verilerinde elde edilmiştir, değerler gerçek değerler değildir):
 <img width="507" height="1074" alt="image" src="https://github.com/user-attachments/assets/de9fcee7-d262-442d-a80c-7ab7afc7c871" />
 
 **Otomasyon Katmanı:**  
