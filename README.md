@@ -151,27 +151,46 @@ Buna rağmen FORCER, kişisel kullanımın ötesinde şu alanlar için de güçl
 - Raporlama ve Sıfırlama Döngüsü Güncellendi: Haftalık raporlama ve sistem sıfırlama saati, kullanıcı yaşam döngüsüne uyum sağlaması amacıyla Pazartesi 03:00’a çekildi.
 - Veri Yapısı Güncellemesi: MEMORY.md dosya yapısı, yeni mola metriklerini ve operasyonel verileri destekleyecek şekilde genişletildi.
 
-## V2 Güncellemesi — Forcer’ın Fiziksele Taşınması
+## V2 Guncellemesi - Forcer Fiziksel Kontrol Katmani
 
-Forcer V2 ile sistem yalnızca Telegram üzerinden çalışan bir ders koçu olmaktan çıkarılıp fiziksel bir kontrol katmanına taşındı. Bu sürümde kullanıcı artık bilgisayara veya telefona dokunmadan, masadaki fiziksel butonlarla seansını yönetebiliyor; LED’lerden anlık durumu görebiliyor ve buzzer üzerinden sesli geri bildirim alabiliyor. Mimari; fiziksel kontrol, ESP32, VPS sunucusu, Telethon tabanlı kullanıcı hesabı entegrasyonu ve Forcer botu arasında katmanlı bir akışla çalışıyor. Butona basıldığında sinyal ESP32 tarafından okunuyor, HTTP isteği Flask sunucusuna gidiyor, Telethon kullanıcı hesabından Telegram’a mesaj gönderiyor ve Forcer komutu sanki kullanıcı yazmış gibi işliyor. ESP32 de düzenli olarak VPS’ten durum çekerek LED’leri güncelliyor.
+Forcer V2 ile sistem sadece Telegram uzerinden calisan bir bot olmaktan cikip, tamamen fiziksel bir kontrol arayuzune tasindi. Bu surumun temel amaci, kullanicinin telefon veya bilgisayar bagimliligini azaltarak masadaki fiziksel butonlarla tum sureci yonetmesini saglamaktir.
 
-İşte donanım için teknik detaylar: 
-[**Forcer devre kurulumu 1**](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER_FIZIKSEL_DEVRE_RAPORU.pdf)
-[**Forcer devre 2 Tamamlanmış versiyon**](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER%20DEVRE%20V2.pdf)
+### Sistem Calisma Mantigi ve Akis
+Sistem; fiziksel donanim, ESP32, VPS sunucusu ve Telethon tabanli bir daemon arasinda cok katmanli bir yapiyla calisiyor:
+
+- Kullanici fiziksel butona bastiginda sinyal ESP32 tarafindan yakalanir.
+- ESP32, VPS uzerindeki Flask sunucusuna ilgili komut icin bir HTTP istegi gonderir.
+- Flask sunucusu, Telethon kutuphanesi ile kullanicinin kendi Telegram hesabi uzerinden Forcer botuna mesaj gonderir. 
+- Bu sayede bot, mesaji gercekten kullanici yazmis gibi algilar ve sureci baslatir.
+- ESP32 her 5 saniyede bir VPS'ten guncel durumu sorgulayarak LED renklerini gunceller.
+
+### Donanim Detaylari ve Pin Semasi
+Donanim tarafı ESP32 DevKit C V4 uzerine kurulu olup; 3 adet panel tipi buton, durum LED'leri ve sesli geri bildirim icin buzzer/DFPlayer icermektedir. Donanim kurulumu sirasinda boot-sensitive pinler ve donanim hatalari nedeniyle rafine edilen final pin semasi su sekildedir:
+
+| Fonksiyon | GPIO Pin | Aciklama |
+| :--- | :--- | :--- |
+| Mola Butonu | GPIO 12 | Pull-down |
+| Devam Butonu | GPIO 19 | Pull-down |
+| Bitir Butonu | GPIO 34 | Pull-down |
+| Kirmizi LED (Idle) | GPIO 13 | 220 Ohm direncli |
+| Sari LED (Mola) | GPIO 25 | 220 Ohm direncli |
+| Yesil LED (Seans) | GPIO 26 | 220 Ohm direncli |
+| Buzzer | GPIO 32 | Aktif sesli uyari |
+
+*Not: GPIO 14 (reboot sorunu), GPIO 27 (fiziksel ariza) ve GPIO 33 (pull-down sorunu) nedeniyle bu pinlerden vazgecilmistir.*
 
 ![WhatsApp Video 2026-03-29 at 8 27 29 PM (1) (online-video-cutter com) (1) (6)](https://github.com/user-attachments/assets/e0f2a57f-1608-4829-9f2e-b3e310c9c6cc)
 
-- Donanım Tarafı
-Donanım tarafında sistem ESP32 DevKit C V4 üzerine kuruldu. Fiziksel arayüz; 3 adet panel tipi anlık buton, 3 adet durum LED’i, aktif buzzer, 220Ω LED dirençleri ve 10kΩ pull-down dirençlerinden oluşuyor. Butonlar mola, devam ve bitir komutlarını fiziksel olarak tetikliyor. LED’ler ise Forcer’ın durumunu görsel olarak yansıtıyor: kırmızı idle/day_closed, sarı on_break, yeşil in_session. Ayrıca Wi-Fi kopması durumunda üç LED birden yanarak hata geri bildirimi veriyor.
-Pin tarafında tasarım, gerçek donanım sorunları görülerek rafine edildi. Boot-sensitive pinler ve fiziksel arızalar nedeniyle bazı GPIO’lar değiştirildi; final eşleşme mola=GPIO12, devam=GPIO19, bitir=GPIO34, red=GPIO13, yellow=GPIO25, green=GPIO26, buzzer=GPIO32 olarak oturdu. Özellikle GPIO14’ün reboot sorunu, GPIO27’nin fiziksel hasarı ve GPIO33’ün pull-down desteği vermemesi gerçek donanım üzerinde tespit edilip çözüldü. Bu sayede V2 sadece teorik değil, sahada denenmiş bir fiziksel sürüm haline geldi.
-Buton devresi pull-down mantığıyla çalışıyor: buton basılı değilken pin 0, basılıyken 1 okuyor. LED’ler seri dirençle sürülüyor. Fiziksel devrenin önemli tarafı, sistemin tamamen masabaşı davranışı için optimize edilmiş olması: butona bastığında LED ve buzzer anında reaksiyon veriyor; ağ gecikmesi olsa bile kullanıcı fiziksel geri bildirim alıyor. Bu da sistemi “yazılım komut arayüzü” olmaktan çıkarıp gerçek bir çalışma aracı haline getiriyor.
-- ESP32 + Sunucu + Telegram Akışı
-ESP32 üzerinde MicroPython çalışıyor. Kod; Wi-Fi bağlantısını yönetiyor, butonları 50ms döngüyle okuyor, HTTP isteklerini ayrı thread’de göndererek ana döngüyü bloke etmiyor ve her 5 saniyede bir VPS’ten session durumunu sorgulayıp LED’leri güncelliyor. Basit ama kritik tasarım kararları alındı: LED kilit mekanizması eklendi, 1 saniyelik çift tetikleme koruması kondu ve hata durumlarında üç kısa beep gibi ayırt edilebilir sesli geri bildirimler tanımlandı.
-VPS tarafında Flask tabanlı iki ana endpoint kullanılıyor: /status, MEMORY.md içinden session durumunu okuyup JSON döndürüyor; /command?cmd=X, gelen komutu Telethon daemon’a iletiyor. Buradaki en kritik karar OpenClaw CLI yerine Telethon userbot kullanılması oldu. Çünkü bot üzerinden gönderilen mesajlar Forcer tarafından kendi kendine yazılmış gibi algılanıyordu; Telethon ile kullanıcının gerçek hesabından gönderilen mesajlar ise Forcer tarafından doğru şekilde “kullanıcı komutu” olarak işlendi. Bu değişiklik aynı zamanda gecikmeyi de ciddi biçimde düşürdü.
-- V1.2 Sonrası Yazılım Geliştirmeleri
-Yazılım tarafında V1.2’den V2’ye geçerken en önemli iyileştirmelerden biri gorev_sirasi mantığı oldu. Sabah verilen görev listesi artık sadece özet olarak saklanmıyor; sıralı bir görev kuyruğu olarak tutuluyor. Böylece başladım komutu otomatik olarak listedeki ilk görevi seçebiliyor, bitti komutu da o görevi listeden düşürüp bir sonraki göreve geçiş hazırlığı yapabiliyor. Bu, Forcer’ın sadece not alan bir sistem değil, görev akışı yöneten bir ajan olmasını güçlendirdi.
-Bir diğer önemli düzeltme ara komutundaydı. Önceki sürümde ara verildiğinde aktif oturum başlangıç saati doğru güncellenmediği için ara süresi aktif süreye eklenebiliyordu. Bu hata düzeltilerek hem ara hem de hgb akışında zaman sayımı daha doğru hale getirildi. Aynı dönemde mola, hgb, ara, devam ve bitti bloklarına eksik olan session_durumu güncellemeleri de açık şekilde eklendi. Böylece fiziksel butonlar ve Telegram mesajları aynı durum makinesine daha tutarlı şekilde bağlandı.
-Model tarafında da bilinçli bir optimizasyon yapıldı: Gemini 2.5 Flash yerine Gemini 2.5 Flash Lite’a geçildi. Gerekçe performans değil, maliyet ve rate limit yönetimiydi. Fiziksel devre testi sırasında hızlı ardışık istekler nedeniyle RPM sınırlarına çarpıldığı için, kural tabanlı ve yapılandırılmış bu sistemde daha ekonomik model seçimi tercih edildi. Bu değişiklik, Forcer’ın sadece akıllı değil aynı zamanda sürdürülebilir ve maliyet kontrollü bir yapıda kalmasına yardımcı oldu.
-- V2 Üzerine Ek İyileştirmeler
-V2 sonrası teknik iyileştirmelerde halka LED ve ses sistemi tarafında da ciddi ilerleme sağlandı. WS2812B halka LED’in session senkronizasyonu çözüldü; in_session, on_break, idle, day_closed, hgb ve ara için farklı ışık davranışları tanımlandı. Özellikle ara durumu için 4 sarı + 4 kırmızı segmentli görünüm, hgb için sarı blink ve in_session için ayrı yeşil parlaklık profili eklendi. Böylece sistemin fiziksel görsel dili daha zengin ve daha anlamlı hale geldi.
-Ses sistemi tarafında DFPlayer Mini için thread çakışması, otomatik sıradaki sesi çalma, SD kart indeksleme ve alarm tetikleme sorunları analiz edilip büyük ölçüde çözüldü. play_token mantığı ile eski thread’lerin yanlış sesi çalması engellendi, ses dosyalarının SD kart sırasına göre davranması dikkate alınarak kurulum prosedürü netleştirildi ve alarm sistemi geçici olarak devre dışı bırakıldı. Bu sürüm, sadece “çalışıyor” değil, donanım davranışları tek tek test edilerek rafine edilmiş bir versiyon oldu.
+### Yazilim ve Model Guncellemeleri
+V1.2 sonrasinda yapilan kritik iyilestirmeler:
+
+- gorev_sirasi Mantigi: Gorev listesi artik basit bir metin degil, sirali bir kuyruk (queue) olarak tutuluyor. "basladim" komutu ilk gorevi secerken, "bitti" komutu otomatik olarak siradaki goreve gecis sagliyor.
+- Model Degisikligi: Gemini 2.5 Flash yerine Gemini 2.5 Flash Lite modeline gecildi. Bu tercih hizdan ziyade, fiziksel cihaz uzerinden yapilan hizli ve ardisik isteklerde RPM (dakikadaki istek) sinirlarina takilmamak ve maliyeti optimize etmek amaciyla yapildi.
+- MicroPython Optimizasyonu: HTTP istekleri ayri bir thread uzerinden gonderilerek ana dongunun buton okuma sirasinda donmasi engellendi.
+
+### Geri Bildirim ve Senkronizasyon
+- LED Halka (WS2812B): in_session, on_break ve day_closed durumlari icin farkli isik profilleri tanimlandi. Mola durumunda 4 sari + 4 kirmizi segmentli ozel bir gosterim eklendi.
+- Ses Sistemi: DFPlayer Mini uzerindeki thread cakismalari "play_token" yapisiyla cozuldu. SD kart uzerindeki ses dosyalari indekslenerek alarm ve onay sesleri stabilize edildi.
+
+[Forcer Devre Raporu 1](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER_FIZIKSEL_DEVRE_RAPORU.pdf)
+[Forcer V2 Final Devre Semasi](https://github.com/bberksacti/FORCER-OpenClaw-TR/blob/main/docs/FORCER%20DEVRE%20V2.pdf)
